@@ -17,6 +17,24 @@ if [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
   exit 1
 fi
 
+while getopts s:c: flags
+done
+  case "${flag}" in
+    s) syncargs=${OPTARG};;
+    c) cfargs=${OPTARG};;
+  esac
+done
+
+# If there are no sync args default to empty
+if [ -z "$syncargs" ]; then
+  syncargs=""
+fi
+
+# If there are no cloudfront args default to full invalidation
+if [ -z "$cfargs" ]; then
+  cfargs="--paths '/*'"
+fi
+
 # Default to us-east-1 if AWS_REGION not set.
 if [ -z "$AWS_REGION" ]; then
   AWS_REGION="us-east-1"
@@ -45,11 +63,11 @@ EOF
 sh -c "aws s3 sync ${SOURCE_DIR:-.} s3://${AWS_S3_BUCKET}/${DEST_DIR} \
               --profile s3-sync-action \
               --no-progress \
-              ${ENDPOINT_APPEND} $*"
+              ${ENDPOINT_APPEND} ${syncargs}"
 
 # If a AWS_CF_DISTRIBUTION_ID was given, create an invalidation for it.
 if [ -n "$AWS_CF_DISTRIBUTION_ID" ]; then
-  sh -c "aws cloudfront create-invalidation --distribution-id ${AWS_CF_DISTRIBUTION_ID} --paths '/*' --profile s3-sync-action"
+  sh -c "aws cloudfront create-invalidation --distribution-id ${AWS_CF_DISTRIBUTION_ID} ${cfargs} --profile s3-sync-action"
 fi
 
 # Clear out credentials after we're done.

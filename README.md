@@ -33,7 +33,7 @@ jobs:
     - uses: actions/checkout@master
     - uses: jakejarvis/s3-sync-action@master
       with:
-        args: --acl public-read --follow-symlinks --delete
+        args: -s "--acl public-read --follow-symlinks --delete" # -s is a string of args for sync.  -c is a string of args for cloudfront.
       env:
         AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
