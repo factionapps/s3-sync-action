@@ -18,7 +18,7 @@ if [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
 fi
 
 while getopts s:c: flags
-do
+done
   case "${flag}" in
     s) syncargs=${OPTARG};;
     c) cfargs=${OPTARG};;
